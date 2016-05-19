@@ -15,7 +15,7 @@ LOCKED = 'locked'
 curr_location = 'Condemned Museum: Atrium'
 
 curr_level = 1
-inventory = []
+inventory = ['Necronomicon']
 
 '''SOME INTERESTING IDEAS:
 Perhaps give main character ability to kill people and then reanimate them and use them - moral quandary (reanimating vs killing)?
@@ -56,6 +56,8 @@ Options:
 	Kill the father because of his genocide of magick users
 	Save the father like he saved you, but somehow disband the cult? - How??
 	-- Players choice? - maybe, this might be interesting
+	
+	
 
 '''
 
@@ -68,17 +70,27 @@ def next_level():
 
 worldPlaces = {
 	'Condemned Museum: Atrium': {
-		DESC: '',
+		DESC: 'You find yourself in a large, dark atrium. The skylight above is streaked with dust and dirt, and soft rays of light cut their way through, illuminating sections of the worn, concrete floor. Debris is strewn about haphazardly, and a thick layer of dust sits on most of the exhibits. The centerpiece of the room was a statue of the founder of the town of Heathervale, Charles Alfred, most of which now lies crumbled on the floor.',
 		PEOPLE: [],
 		GROUND: [],
+		NORTH: 'Condemned Museum: Records',
+		LOCKED: False},
+	'Condemned Museum: Records': {
+		DESC: '',
+		PEOPLE: [],
+		GROUND: ['Book: Obituaries, 1896 - 1897',],
+		SOUTH: 'Condemned Museum: Atrium',
 		LOCKED: False},
 	}
 
 itemList = {
 	'Necronomicon': {
-		SHORTDESC: 'A book bound black ...',
-		DESC: 'Blah blah blah',
+		SHORTDESC: 'A book bound in black velvet with silver markings inscribed upon the cover.',
+		DESC: 'A book bound in black velvet with silver markings inscribed upon the cover. It is filled with detailed descriptions of necromancy and other rituals surrounding death. The pages are marked heavily with notes.',
 		TAKEABLE: True},
+	'Book: Obituaries, 1896 - 1897': {
+		#PUT STUFF IN HERE
+	}
 	}
 
 peopleList = {
