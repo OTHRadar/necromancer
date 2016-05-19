@@ -12,7 +12,7 @@ EAST = 'east'
 WEST = 'west'
 SCREEN_WIDTH = 75
 LOCKED = 'locked'
-curr_location = 'Condemned Museum'
+curr_location = 'Condemned Museum: Atrium'
 
 curr_level = 1
 inventory = []
@@ -67,8 +67,8 @@ def next_level():
 	curr_level += 1
 
 worldPlaces = {
-	'Condemned Museum': {
-		DESC: 'Condemned Museum Desc',
+	'Condemned Museum: Atrium': {
+		DESC: '',
 		PEOPLE: [],
 		GROUND: [],
 		LOCKED: False},
@@ -120,6 +120,12 @@ def list_places():
 	for place in worldPlaces:
 		print place
 
+def go(direction):
+	if direction in worldPlaces[curr_location]:
+		change_location(worldPlaces[curr_location][direction])
+	else:
+		pretty_print('You can\'t go that direction.')
+		
 def change_location(location):
 	if worldPlaces[location][LOCKED]:
 		pretty_print('You have no reason to go here.')
@@ -256,23 +262,18 @@ class adventureConsole(cmd.Cmd):
 		dest = ''
 		arg = arg.title()
 		if arg == '':
-			pretty_print('Where are you going?')
+			pretty_print('Which direction are you going?')
 			return
-		if arg == curr_location:
-			pretty_print('You\'re already at ' + arg + '.')
-		elif arg in worldPlaces:
-			change_location(arg)
-		elif arg:
-			for place in worldPlaces:
-				if arg in place.split():
-					if place == curr_location:
-						pretty_print('You\'re already at ' + place + '.')
-					else:
-						change_location(place)
-					return
-			pretty_print('That isn\'t a valid location.')
+		elif arg.lower() in NORTH:
+			go(NORTH)
+		elif arg.lower() in SOUTH:
+			go(SOUTH)
+		elif arg.lower() in EAST:
+			go(EAST)
+		elif arg.lower() in WEST:
+			go(WEST)
 		else:
-			pretty_print('That isn\'t a valid location.')
+			pretty_print('That\'s not a valid direction. Try NORTH, SOUTH, EAST, or WEST.')
 	def help_go(self):
 		pretty_print('Usage: go <place>')
 		pretty_print('Takes you to the specified location.')
