@@ -1,0 +1,1 @@
+All Necromancer code is free for your personal use. If you wish to use this code base commercially or for financial gain, you must first gain my permission. All code is provided as is, and is subject to change at any time. I assume no liability for the execution, forking, or any modification of this codebase. 
