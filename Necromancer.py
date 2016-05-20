@@ -62,7 +62,7 @@ Options:
 
 '''
 
-def set_currLocation(location):
+def set_curr_location(location):
 	global currLocation
 	currLocation = location
 
@@ -144,7 +144,7 @@ def change_location(location):
 	if worldPlaces[location][LOCKED]:
 		pretty_print('You have no reason to go here.')
 	else:
-		set_currLocation(location)
+		set_curr_location(location)
 		display_place_info(location)
 
 def take_item(item):
