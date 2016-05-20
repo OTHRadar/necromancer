@@ -15,7 +15,6 @@ SCREEN_WIDTH = 75
 LOCKED = 'locked'
 currLocation = 'Condemned Museum: Atrium'
 
-currLevel = 1
 inventory = ['Necronomicon', 'Spade']
 
 '''SOME INTERESTING IDEAS:
@@ -65,9 +64,6 @@ Options:
 def set_curr_location(location):
 	global currLocation
 	currLocation = location
-
-def next_level():
-	currLevel += 1
 
 worldPlaces = {
 	'Condemned Museum: Atrium': {
