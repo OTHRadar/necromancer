@@ -5,17 +5,19 @@ SHORTDESC = 'shortdesc'
 TAKEABLE = 'takeable'
 PLACES = 'places'
 PEOPLE = 'people'
-GROUND = 'ground'
 DECEASED = 'deceased'
+DUGUP = 'dugup'
+GROUND = 'ground'
+UNDERGROUND = 'underground'
 NORTH = 'north'
 SOUTH = 'south'
 EAST = 'east'
 WEST = 'west'
 SCREEN_WIDTH = 75
 LOCKED = 'locked'
-currLocation = 'Condemned Museum: Atrium'
+currLocation = 'The Condemned Museum\'s Atrium'
 
-inventory = ['Necronomicon', 'Spade']
+inventory = []
 
 '''SOME INTERESTING IDEAS:
 Perhaps give main character ability to kill people and then reanimate them and use them - moral quandary (reanimating vs killing)?
@@ -66,46 +68,97 @@ def set_curr_location(location):
 	currLocation = location
 
 worldPlaces = {
-	'Condemned Museum: Atrium': {
+	'The Condemned Museum\'s Atrium': {
 		DESC: 'You find yourself in a large, dark atrium. The skylight above is streaked with dust and dirt. Soft rays of light cut their way through, illuminating sections of the worn, concrete floor. Debris is strewn about haphazardly, and a thick layer of dust sits on most of the exhibits. The centerpiece of the room is a statue of the founder of the town of Heathervale, Charles Alfred, most of which now lies crumbled on the floor.',
 		PEOPLE: [],
 		GROUND: [],
-		NORTH: 'Condemned Museum: Records',
+		NORTH: 'The Condemned Museum\'s Records Room',
+		SOUTH: 'The Condemned Museum\'s Courtyard',
 		LOCKED: False},
-	'Condemned Museum: Records': {
+	'The Condemned Museum\'s Records Room': {
 		DESC: 'The air in the records room is thick with the smell of dusty old books. Rows of shelves fill the area, and stacks of books can be found gathering cobwebs in the corners. The room is dimly lit by an oil lamp sitting on a desk next to the door.',
 		PEOPLE: [],
-		GROUND: ['Book Of Obituaries, 1896 - 1897'],
-		SOUTH: 'Condemned Museum: Atrium',
+		GROUND: ['Book - Obituaries, 1890 - 1900', 'Book - Necronomicon'],
+		SOUTH: 'The Condemned Museum\'s Atrium',
 		LOCKED: False},
+	'The Condemned Museum\'s Courtyard': {
+		DESC:'The cold night air assails you as you leave the museum. It carries with it the stench of wet livestock, from the farms of nearby Heathervale. Crumbled stone benches surround a fountain in which stagnant water is pooling from the recent rain.',
+		PEOPLE: [],
+		GROUND: [],
+		NORTH: 'The Condemned Museum\'s Atrium',
+		EAST: 'Heathervale Town Square',
+		LOCKED: False},
+	'Heathervale Town Square': {
+		DESC:'You enter the town square. The shops and streets lie abandoned as everyone has turned in for the night. The streets are cobbled and well-maintaned, though weeds are beginning to emerge from the cracks.',
+		PEOPLE: [],
+		GROUND: [],
+		WEST: 'The Condemned Museum\'s Courtyard',
+		SOUTH: 'Old Mary\'s Farm',
+		EAST: 'Heathervale Graveyard',
+		LOCKED: False},
+	'Old Mary\'s Farm': {
+		DESC:'Blah farm.',
+		PEOPLE: [],
+		GROUND:[],
+		NORTH:'Heathervale Town Square',
+		WEST:'Old Mary\'s Farmhouse',
+		LOCKED: False},
+	'Old Mary\'s Farmhouse': {
+		DESC: 'A small yellow house with white trim. The paint is cracking and peeling, and has lost its luster. An ornamental windmill sits next to the house, slowly rotating in the wind.',
+		PEOPLE: [],
+		GROUND: ['Spade'],
+		EAST:'Old Mary\'s Farm',
+		LOCKED: False},
+	'Heathervale Graveyard': {
+		DESC: 'The gate to the graveyard creaks slightly as you push it open. The lawn is dotted with trees and bushes, and headstones line the three paths splitting from the entrance. A small shack lies at the end of the path to the North.',
+		PEOPLE: [],
+		GROUND: [],
+		WEST: 'Heathervale Town Square',
+		NORTH: 'North Graveyard Path',
+		SOUTH: 'South Graveyard Path',
+		EAST: 'East Graveyard Path',
+		LOCKED: False},
+	'East Graveyard Path': {
+		DESC: 'You walk down the path to the east, treading lightly so as to not disturb the gravel beneath your feet.',
+		PEOPLE: [],
+		DECEASED: ['Joseph Orazio'],
+		UNDERGROUND: ['Joseph Orazio\'s Watch'],
+		GROUND: ['Joseph Orazio\'s Gravestone'],
+		WEST: 'Heathervale Graveyard',
+		LOCKED: False}
 	}
 	
 peopleList = {
 	'Self': {
-		SHORTDESC: 'A --- woman. Dark hair, blah blah',
-		DESC: 'Blah blah',
-		DECEASED: False},
+		SHORTDESC: 'You are an emaciated young woman with piercing blue eyes and pale white skin, short in stature. Your hair is black and haphazardly cut to neck length. You are wearing a black shirt and pants you fashioned yourself in order to move silently at night without being seen.',},
 }
-
+deceasedPeopleList = {
+	'Joseph Orazio': {
+		SHORTDESC: 'Joseph Orazio, son of Barbera Orazio, died May 18, 1892. He was 24. The cause of death was exhaustion in the heat of the sun, as confirmed by his brothers working with him in the fields. He was an excellent farmhand and cared for his family. He was buried on the East side of the Heathervale graveyard. He is survived by his wife, Sera.',
+		DUGUP: False },
+}
 obituaryLongDesc = ''
 
 def getObituaryLongDesc():
-	for p in peopleList:
-		if peopleList[p][DECEASED]:
-			obituaryLongDesc += p + ' ' + peopleList[p][SHORTDESC] + '\n'
+	for p in deceasedPeopleList:
+		obituaryLongDesc += p + ' ' + peopleList[p][SHORTDESC] + '\n'
 	
 itemList = {
-	'Necronomicon': {
+	'Book - Necronomicon': {
 		SHORTDESC: 'A book bound in black velvet with silver markings inscribed upon the cover.',
 		DESC: 'A book bound in black velvet with silver markings inscribed upon the cover. It is filled with detailed descriptions of necromancy and other rituals surrounding death. The pages are marked heavily with notes.',
 		TAKEABLE: True},
 	'Spade': {
 		SHORTDESC: 'A rusty old spade with a wooden handle and an iron tip.',
 		TAKEABLE: True},
-	'Book Of Obituaries, 1896 - 1897': {
+	'Book - Obituaries, 1890 - 1900': {
 		SHORTDESC: 'A large book of obituaries. It is heavy in your hand.',
 		DESC: obituaryLongDesc,
 		TAKEABLE: False },
+	'Joseph Orazio\'s Gravestone': {
+		SHORTDESC: 'A small headstone. A solitary daisy lies on the ground at its base.',
+		DESC: 'JosephOrazio\n1868 - 1892',
+		TAKEABLE: False }
 	}
 
 def pretty_print(text):
@@ -120,10 +173,35 @@ def pretty_center_print(text):
 		for line in textwrap.wrap(txt, SCREEN_WIDTH):
 			print (' ' * ((SCREEN_WIDTH - len(txt)) / 2) + line + (' ' * ((SCREEN_WIDTH - len(txt)) / 2)) )
 
+def replace_last(sourceString, replaceWhat, replaceWith):
+    head, sep, tail = sourceString.rpartition(replaceWhat)
+    return head + replaceWith + tail
+			
 def display_place_info(place):
 	pretty_print(place)
 	pretty_print('-' * SCREEN_WIDTH)
 	pretty_print(worldPlaces[place][DESC])
+	print
+	exits = ''
+	numexits = 0
+	if NORTH in worldPlaces[place]:
+		numexits += 1
+		exits += worldPlaces[place][NORTH] + ' is to the NORTH, '
+	if SOUTH in worldPlaces[place]:
+		numexits += 1
+		exits += worldPlaces[place][SOUTH] + ' is to the SOUTH, '
+	if EAST in worldPlaces[place]:
+		numexits += 1
+		exits += worldPlaces[place][EAST] + ' is to the EAST, '
+	if WEST in worldPlaces[place]:
+		numexits += 1
+		exits += worldPlaces[place][WEST] + ' is to the WEST, '
+	if (numexits == 1):
+		pretty_print((exits)[:-2] + '.')
+	else:
+		exits = replace_last(exits, ',', ' and')
+		exits = replace_last(exits, ',', ' and')
+		pretty_print((exits)[:-5] + '.')
 	pretty_print('-' * SCREEN_WIDTH)
 
 def list_places():
@@ -182,6 +260,14 @@ def show_inventory():
 	for item in inventory:
 			pretty_print(item + ': ' + itemList[item][SHORTDESC] + '\n')
 		
+def dig():
+	if UNDERGROUND in worldPlaces[currLocation] or DECEASED in worldPlaces[currLocation]:
+		for item in worldPlaces[currLocation][UNDERGROUND]:
+			worldPlaces[currLocation][UNDERGROUND].remove(item)
+			worldPlaces[currLocation][GROUND].append(item)
+		for dp in worldPlaces[currLocation][DECEASED]:
+			deceasedPeopleList[dp][DUGUP] = True
+
 def examine(arg):
 	if arg == '':
 		pretty_print('What are you examining?')
@@ -212,10 +298,13 @@ def look(arg):
 			for person in worldPlaces[currLocation][PEOPLE]:
 				pretty_print(' -' + person)
 		print
-		if len(worldPlaces[currLocation][GROUND]) > 0:
+		if len(worldPlaces[currLocation][GROUND]) > 0 or len(worldPlaces[currLocation][DECEASED]) > 0:
 			print 'Things in this location:'
 			for item in worldPlaces[currLocation][GROUND]:
 				pretty_print(' -' + item)
+			for dp in worldPlaces[currLocation][DECEASED]:
+				if deceasedPeopleList[dp][DUGUP] == True:
+					pretty_print(' -' + dp + '\'s Corpse') #FIGURE OUT HOW TO GET ENGINE TO RESPECT THE WORD CORPSE
 		if len(worldPlaces[currLocation][PEOPLE]) == 0 and len(worldPlaces[currLocation][GROUND]) == 0:
 			pretty_print('There\'s nothing of interest here.')
 		return
@@ -320,6 +409,11 @@ class adventureConsole(cmd.Cmd):
 	def help_location(self):
 		print
 		pretty_print('Shows information on the current location.')
+	def do_dig(self, arg):
+		print
+		dig()
+	def help_dig(self):
+		pretty_print('Use items like shovels and spades.')
 	def do_talk(self, arg):
 		print
 		talk(arg.title())
@@ -439,13 +533,10 @@ def checkAll():
 		for worldPlace in worldPlaces:
 			for item in worldPlaces[worldPlace][GROUND]:
 				if item not in itemList:
-					sys.exit('ERROR: There was a problem loading items: All ground items must be in the itemList.')
+					sys.exit('ERROR: There was a problem loading items: All ground items must be in the itemList: ' + item)
 			for person in worldPlaces[worldPlace][PEOPLE]:
 				if person not in peopleList:
-					sys.exit('ERROR: There was a problem loading people: All world people must be in the peopleList.')
-			for item in itemList:
-				if not item.istitle():
-					sys.exit('ERROR: There was a problem loading items: items must be title case.')
+					sys.exit('ERROR: There was a problem loading people: All world people must be in the peopleList:' + person)
 	
 if __name__ == '__main__':
 	pretty_center_print('---------------------------------------------------------------')
