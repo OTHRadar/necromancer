@@ -138,7 +138,7 @@ def go(direction):
 		
 def change_location(location):
 	if worldPlaces[location][LOCKED]:
-		pretty_print('You have no reason to go here.')
+		pretty_print('You can\'t go to this location right now.')
 	else:
 		set_curr_location(location)
 		display_place_info(location)
