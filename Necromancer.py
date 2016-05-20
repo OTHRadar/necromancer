@@ -128,16 +128,6 @@ def display_place_info(place):
 	pretty_print(place)
 	pretty_print('-' * SCREEN_WIDTH)
 	pretty_print(worldPlaces[place][DESC])
-	#if len(worldPlaces[place][PEOPLE]) > 0:
-	#	print
-	#	print 'People at this location:'
-	#	for person in worldPlaces[place][PEOPLE]:
-	#		pretty_print(' -' + person)
-	#print
-	#if len(worldPlaces[place][GROUND]) > 0:
-	#	print 'Things in this location:'
-	#	for item in worldPlaces[place][GROUND]:
-	#		pretty_print(' -' + item)
 	pretty_print('-' * SCREEN_WIDTH)
 
 def list_places():
