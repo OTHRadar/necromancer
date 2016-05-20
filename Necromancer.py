@@ -6,16 +6,17 @@ TAKEABLE = 'takeable'
 PLACES = 'places'
 PEOPLE = 'people'
 GROUND = 'ground'
+DECEASED = 'deceased'
 NORTH = 'north'
 SOUTH = 'south'
 EAST = 'east'
 WEST = 'west'
 SCREEN_WIDTH = 75
 LOCKED = 'locked'
-curr_location = 'Condemned Museum: Atrium'
+currLocation = 'Condemned Museum: Atrium'
 
-curr_level = 1
-inventory = ['Necronomicon']
+currLevel = 1
+inventory = ['Necronomicon', 'Spade']
 
 '''SOME INTERESTING IDEAS:
 Perhaps give main character ability to kill people and then reanimate them and use them - moral quandary (reanimating vs killing)?
@@ -61,43 +62,55 @@ Options:
 
 '''
 
-def set_curr_location(location):
-	global curr_location
-	curr_location = location
+def set_currLocation(location):
+	global currLocation
+	currLocation = location
 
 def next_level():
-	curr_level += 1
+	currLevel += 1
 
 worldPlaces = {
 	'Condemned Museum: Atrium': {
-		DESC: 'You find yourself in a large, dark atrium. The skylight above is streaked with dust and dirt, and soft rays of light cut their way through, illuminating sections of the worn, concrete floor. Debris is strewn about haphazardly, and a thick layer of dust sits on most of the exhibits. The centerpiece of the room was a statue of the founder of the town of Heathervale, Charles Alfred, most of which now lies crumbled on the floor.',
+		DESC: 'You find yourself in a large, dark atrium. The skylight above is streaked with dust and dirt. Soft rays of light cut their way through, illuminating sections of the worn, concrete floor. Debris is strewn about haphazardly, and a thick layer of dust sits on most of the exhibits. The centerpiece of the room is a statue of the founder of the town of Heathervale, Charles Alfred, most of which now lies crumbled on the floor.',
 		PEOPLE: [],
 		GROUND: [],
 		NORTH: 'Condemned Museum: Records',
 		LOCKED: False},
 	'Condemned Museum: Records': {
-		DESC: '',
+		DESC: 'The air in the records room is thick with the smell of dusty old books. Rows of shelves fill the area, and stacks of books can be found gathering cobwebs in the corners. The room is dimly lit by an oil lamp sitting on a desk next to the door.',
 		PEOPLE: [],
-		GROUND: ['Book: Obituaries, 1896 - 1897',],
+		GROUND: ['Book Of Obituaries, 1896 - 1897'],
 		SOUTH: 'Condemned Museum: Atrium',
 		LOCKED: False},
 	}
+	
+peopleList = {
+	'Self': {
+		SHORTDESC: 'A --- woman. Dark hair, blah blah',
+		DESC: 'Blah blah',
+		DECEASED: False},
+}
 
+obituaryLongDesc = ''
+
+def getObituaryLongDesc():
+	for p in peopleList:
+		if peopleList[p][DECEASED]:
+			obituaryLongDesc += p + ' ' + peopleList[p][SHORTDESC] + '\n'
+	
 itemList = {
 	'Necronomicon': {
 		SHORTDESC: 'A book bound in black velvet with silver markings inscribed upon the cover.',
 		DESC: 'A book bound in black velvet with silver markings inscribed upon the cover. It is filled with detailed descriptions of necromancy and other rituals surrounding death. The pages are marked heavily with notes.',
 		TAKEABLE: True},
-	'Book: Obituaries, 1896 - 1897': {
-		#PUT STUFF IN HERE
+	'Spade': {
+		SHORTDESC: 'A rusty old spade with a wooden handle and an iron tip.',
+		TAKEABLE: True},
+	'Book Of Obituaries, 1896 - 1897': {
+		SHORTDESC: 'A large book of obituaries. It is heavy in your hand.',
+		DESC: obituaryLongDesc,
+		TAKEABLE: False },
 	}
-	}
-
-peopleList = {
-	'Self': {
-		SHORTDESC: 'A --- woman. Dark hair, blah blah',
-		DESC: 'Blah blah'},
-}	
 
 def pretty_print(text):
 	tarray = text.split('\n')
@@ -112,7 +125,6 @@ def pretty_center_print(text):
 			print (' ' * ((SCREEN_WIDTH - len(txt)) / 2) + line + (' ' * ((SCREEN_WIDTH - len(txt)) / 2)) )
 
 def display_place_info(place):
-	print
 	pretty_print(place)
 	pretty_print('-' * SCREEN_WIDTH)
 	pretty_print(worldPlaces[place][DESC])
@@ -133,8 +145,8 @@ def list_places():
 		print place
 
 def go(direction):
-	if direction in worldPlaces[curr_location]:
-		change_location(worldPlaces[curr_location][direction])
+	if direction in worldPlaces[currLocation]:
+		change_location(worldPlaces[currLocation][direction])
 	else:
 		pretty_print('You can\'t go that direction.')
 		
@@ -142,153 +154,312 @@ def change_location(location):
 	if worldPlaces[location][LOCKED]:
 		pretty_print('You have no reason to go here.')
 	else:
-		set_curr_location(location)
+		set_currLocation(location)
 		display_place_info(location)
 
 def take_item(item):
-	worldPlaces[curr_location][GROUND].remove(item)
+	worldPlaces[currLocation][GROUND].remove(item)
 	inventory.append(item)
 
+def quit_game():
+	yn = ''
+	while yn != 'Y' and yn != 'N':
+		yn = raw_input('Do you really want to quit? All unsaved progress will be lost (y/n): ')
+		yn = yn.title()
+		if yn == 'Y':
+			sys.exit('You have quit the game.')
+		if yn == 'N':
+			return
+				
+def talk(arg):
+	if arg == '':
+		pretty_print('Who are you talking to?')
+		return
+	if arg == 'Self':
+		pretty_print('Don\'t do that. People will think you\'re weird.')
+		return
+	for person in worldPlaces[currLocation][PEOPLE]:
+		if arg in person:
+			if peopleList[person][DNUM] >= len(peopleList[person][DIALOG]):
+				pretty_print('They don\'t have anything more to say.')
+			else:
+				pretty_print('\"' + peopleList[person][DIALOG][peopleList[person][DNUM]] + '\"')
+				peopleList[person][DNUM] += 1
+			return
+	pretty_print('Nobody named ' + arg + ' could be found at this location.')
+
+def show_inventory():
+	inventory.sort()
+	if len(inventory) == 0:
+		pretty_print('Your inventory is empty.')
+	inv_printer = ''
+	for item in inventory:
+			pretty_print(item + ': ' + itemList[item][SHORTDESC] + '\n')
+		
+def examine(arg):
+	if arg == '':
+		pretty_print('What are you examining?')
+		return
+	for item in (inventory + worldPlaces[currLocation][GROUND]):
+		if arg in item:
+			if DESC in itemList[item]:
+				pretty_print(item + ': ' + itemList[item][DESC] + '\n')
+				return
+			else:
+				pretty_print(item + ': ' + itemList[item][SHORTDESC] + '\n')
+				return
+	for person in (worldPlaces[currLocation][PEOPLE] + ['Self']):
+		if arg in person:
+			if DESC in itemList[item]:
+				pretty_print(person + ': ' + peopleList[person][DESC] + '\n')
+				return
+			else:
+				pretty_print(person + ': ' + peopleList[person][SHORTDESC] + '\n')
+				return
+	pretty_print('There isn\'t anything like that to look at.')
+
+def look(arg):
+	if arg == '':
+		if len(worldPlaces[currLocation][PEOPLE]) > 0:
+			print
+			print 'People at this location:'
+			for person in worldPlaces[currLocation][PEOPLE]:
+				pretty_print(' -' + person)
+		print
+		if len(worldPlaces[currLocation][GROUND]) > 0:
+			print 'Things in this location:'
+			for item in worldPlaces[currLocation][GROUND]:
+				pretty_print(' -' + item)
+		if len(worldPlaces[currLocation][PEOPLE]) == 0 and len(worldPlaces[currLocation][GROUND]) == 0:
+			pretty_print('There\'s nothing of interest here.')
+		return
+	i = 0
+	itemToExamine = ''
+	for item in (inventory + worldPlaces[currLocation][GROUND]):
+		if arg in item:
+			i += 1
+			if i > 1:
+				pretty_print('You\'ll have to be more specific.')
+				return
+			itemToExamine = item
+	i = 0
+	personToExamine = ''
+	for person in (worldPlaces[currLocation][PEOPLE] + ['Self']):
+		if arg in person:
+			i += 1
+			if i > 1:
+				pretty_print('You\'ll have to be more specific.')
+				return
+			personToExamine = person
+	if itemToExamine is not '' and personToExamine is not '':
+		pretty_print('You\'ll have to be more specific.')
+		return
+	if itemToExamine is not '':
+		pretty_print(itemToExamine + ': ' + itemList[itemToExamine][SHORTDESC] + '\n')
+		return
+	if personToExamine is not '':
+		pretty_print(person + ': ' + peopleList[personToExamine][SHORTDESC] + '\n')
+		return
+	pretty_print('There isn\'t anything like that to look at.')
+	
+def take(arg):
+	if arg == '':
+		pretty_print('What are you taking?')
+		return
+	for item in worldPlaces[currLocation][GROUND]:
+		if arg in item:
+			if itemList[item][TAKEABLE]:
+				pretty_print('Taken.')
+				take_item(item)
+			else:
+				pretty_print('You can\'t take this item.')
+			return
+	pretty_print(arg + ' can\'t be picked up.')
+
+def drop(arg):
+	for item in inventory:
+		if arg in item:
+			yn = ''
+			while yn != 'Y' and yn != 'N':
+				yn = raw_input('Drop Item? (y/n): ')
+				yn = yn.title()
+			if yn == 'Y':
+				inventory.remove(item)
+				worldPlaces[currLocation][GROUND].append(item)
+				print 'Dropped.'
+				return
+	pretty_print('Nothing like that could be dropped.')
+	
+def go_helper(arg):
+	dest = ''
+	if arg == '':
+		pretty_print('Which direction are you going?')
+		return
+	elif arg.lower() in NORTH:
+		go(NORTH)
+	elif arg.lower() in SOUTH:
+		go(SOUTH)
+	elif arg.lower() in EAST:
+		go(EAST)
+	elif arg.lower() in WEST:
+		go(WEST)
+	else:
+		pretty_print('That\'s not a valid direction. Try NORTH, SOUTH, EAST, or WEST.')
+	
 class adventureConsole(cmd.Cmd):
 	prompt = '\n> '
+	doc_header = 'Commands are documented below. Type \'help commands\' to learn how to use them.\n'
+	ruler = ''
 	def default(self, arg):
-		pretty_print('That isn\'t a valid command. Type \"help\" for a list of commands.')
+		print
+		pretty_print('That isn\'t a valid command. Type \'help\' for a list of commands.')
+	def emptyline(self):
+		print
+		pretty_print('You\'ll have to specify a command.')
+	def do_commands(self, arg):
+		print
+		pretty_print('Type \'help commands\' to learn about commands.')
+	def help_commands(self):
+		print
+		pretty_print('Commands are how you interact with the game. Typing \'go north\', for example, will move your character to the north. You can type \'help\' followed by the name of a command to see more information on how to use it. Commands tend to be pretty smart, so you will rarely need to fully qualify names. \'examine book\', for example, will be enough if there is an item called \'Recipe book\': the program is smart enough to figure out what you mean. If the provided argument matches multiple items, for example, you type \'look book\' and both a recipe book and a bookend are in the area, it will ask you to be more specific. Many other shorthands are provided for ease of play.')
 	def do_quit(self,arg):
-		return True
+		print
+		quit_game()
 	def help_quit(self):
+		print
 		pretty_print('Quits the game.')
 	def do_location(self, arg):
-		display_place_info(curr_location)
+		print
+		display_place_info(currLocation)
 	def help_location(self):
+		print
 		pretty_print('Shows information on the current location.')
 	def do_talk(self, arg):
-		arg = arg.title()
-		if arg == '':
-			pretty_print('Who are you talking to?')
-			return
-		if arg == 'Self':
-			pretty_print('Don\'t do that. People will think you\'re weird.')
-			return
-		for person in worldPlaces[curr_location][PEOPLE]:
-			if arg in person:
-				if peopleList[person][DNUM] >= len(peopleList[person][DIALOG]):
-					pretty_print('They don\'t have anything more to say.')
-				else:
-					pretty_print('\"' + peopleList[person][DIALOG][peopleList[person][DNUM]] + '\"')
-					peopleList[person][DNUM] += 1
-				return
-		pretty_print('Nobody named ' + arg + ' could be found at this location.')
+		print
+		talk(arg.title())
 	def help_talk(self):
+		print
 		pretty_print('Usage: talk <person>')
 		pretty_print('Begins a conversation with a person in the location.')	
 	def do_inventory(self, arg):
-		inventory.sort()
-		if len(inventory) == 0:
-			pretty_print('Your inventory is empty.')
-		inv_printer = ''
-		for item in inventory:
-			pretty_print(item + ': ' + itemList[item][SHORTDESC] + '\n')
-
+		print
+		show_inventory()
 	def help_inventory(self):
+		print
 		pretty_print('Shows the items in your inventory.')
+	def do_inv(self, arg):
+		print
+		show_inventory()
+	def help_inv(self):
+		print
+		pretty_print('Shorthand for \'inventory\'.')
+	def do_i(self, arg):
+		print
+		show_inventory()
+	def help_i(self):
+		print
+		pretty_print('Shorthand for \'inventory\'.')
 	def do_look(self, arg):
-		arg = arg.title()
-		if arg == '':
-			if len(worldPlaces[curr_location][PEOPLE]) > 0:
-				print
-				print 'People at this location:'
-				for person in worldPlaces[curr_location][PEOPLE]:
-					pretty_print(' -' + person)
-			print
-			if len(worldPlaces[curr_location][GROUND]) > 0:
-				print 'Things in this location:'
-				for item in worldPlaces[curr_location][GROUND]:
-					pretty_print(' -' + item)
-			if len(worldPlaces[curr_location][PEOPLE]) == 0 and len(worldPlaces[curr_location][GROUND]) == 0:
-				pretty_print('There\'s nothing of interest here.')
-			return
-		for item in (inventory + worldPlaces[curr_location][GROUND]):
-			if arg in item:
-				pretty_print(item + ': ' + itemList[item][SHORTDESC] + '\n')
-				return
-		for person in (worldPlaces[curr_location][PEOPLE] + ['Self']):
-			if arg in person:
-				pretty_print(person + ': ' + peopleList[person][SHORTDESC] + '\n')
-				return
-		pretty_print('There isn\'t anything like that to look at.')
+		print
+		look(arg.title())
 	def help_look(self):
+		print
 		pretty_print('Usage: look  OR  look <item>  OR  look <person>')
 		pretty_print('Gives a short description of the item.')
 	def do_examine(self, arg):
-		arg = arg.title()
-		if arg == '':
-			pretty_print('What are you examining?')
-			return
-		for item in (inventory + worldPlaces[curr_location][GROUND]):
-			if arg in item:
-				pretty_print(item + ': ' + itemList[item][DESC] + '\n')
-				return
-		for person in (worldPlaces[curr_location][PEOPLE] + ['Self']):
-			if arg in person:
-				pretty_print(person + ': ' + peopleList[person][DESC] + '\n')
-				return
-		pretty_print('There isn\'t anything like that to look at.')
+		print
+		examine(arg.title())
 	def help_examine(self):
+		print
 		pretty_print('Usage: examine <item>  OR  examine <person>')
 		pretty_print('Various uses. Typically gives a more in depth description of an item, allows you to see its contents (like in the case of letters or maps), or gives extra information.')
+	def do_ex(self, arg):
+		print
+		examine(arg.title())
+	def help_ex(self):
+		print
+		pretty_print('Shorthand for \'examine\'.')
 	def do_take(self, arg):
-		arg = arg.title()
-		if arg == '':
-			pretty_print('What are you taking?')
-			return
-		for item in worldPlaces[curr_location][GROUND]:
-			if arg in item:
-				if itemList[item][TAKEABLE]:
-					pretty_print('Taken.')
-					take_item(item)
-				else:
-					pretty_print('You can\'t take this item.')
-				return
-		pretty_print(arg + ' can\'t be picked up.')
+		print
+		take(arg.title())
 	def help_take(self):
+		print
 		pretty_print('Usage: take <item>')
 		pretty_print('Picks up an item and put it in your inventory, along with any associated effects of doing so.')
 	def do_drop(self, arg):
-		arg = arg.title()
-		for item in inventory:
-			if arg in item:
-				yn = ''
-				while yn != 'Y' and yn != 'N':
-					yn = raw_input('Drop Item? (y/n): ')
-					yn = yn.title()
-				if yn == 'Y':
-					inventory.remove(item)
-					worldPlaces[curr_location][GROUND].append(item)
-					print 'Dropped.'
-					return
-		pretty_print('Nothing like that could be dropped.')
+		print
+		drop(arg.title())
 	def help_drop(self):
+		print
 		pretty_print('Usage: drop <item>')
 		pretty_print('Removes an item from your inventory, along with any associated effects of doing so.')
 	def do_go(self, arg):
-		dest = ''
-		arg = arg.title()
-		if arg == '':
-			pretty_print('Which direction are you going?')
-			return
-		elif arg.lower() in NORTH:
-			go(NORTH)
-		elif arg.lower() in SOUTH:
-			go(SOUTH)
-		elif arg.lower() in EAST:
-			go(EAST)
-		elif arg.lower() in WEST:
-			go(WEST)
-		else:
-			pretty_print('That\'s not a valid direction. Try NORTH, SOUTH, EAST, or WEST.')
+		print
+		go_helper(arg.title())
+	def do_n(self, arg):
+		print
+		go(NORTH)
+	def do_s(self, arg):
+		print
+		go(SOUTH)
+	def do_e(self, arg):
+		print
+		go(EAST)
+	def do_w(self, arg):
+		print
+		go(WEST)
+	def do_north(self, arg):
+		print
+		go(NORTH)
+	def do_south(self, arg):
+		print
+		go(SOUTH)
+	def do_east(self, arg):
+		print
+		go(EAST)
+	def do_west(self, arg):
+		print
+		go(WEST)
+	def help_n(self):
+		print
+		pretty_print('Shorthand for \'go NORTH\'.')
+	def help_s(self):
+		print
+		pretty_print('Shorthand for \'go SOUTH\'.')
+	def help_e(self):
+		print
+		pretty_print('Shorthand for \'go EAST\'.')
+	def help_w(self):
+		print
+		pretty_print('Shorthand for \'go WEST\'.')
+	def help_north(self):
+		print
+		pretty_print('Shorthand for \'go NORTH\'.')
+	def help_south(self):
+		print
+		pretty_print('Shorthand for \'go SOUTH\'.')
+	def help_east(self):
+		print
+		pretty_print('Shorthand for \'go EAST\'.')
+	def help_west(self):
+		print
+		pretty_print('Shorthand for \'go WEST\'.')
 	def help_go(self):
+		print
 		pretty_print('Usage: go <place>')
 		pretty_print('Takes you to the specified location.')
+		
+def checkAll():
+		for worldPlace in worldPlaces:
+			for item in worldPlaces[worldPlace][GROUND]:
+				if item not in itemList:
+					sys.exit('ERROR: There was a problem loading items: All ground items must be in the itemList.')
+			for person in worldPlaces[worldPlace][PEOPLE]:
+				if person not in peopleList:
+					sys.exit('ERROR: There was a problem loading people: All world people must be in the peopleList.')
+			for item in itemList:
+				if not item.istitle():
+					sys.exit('ERROR: There was a problem loading items: items must be title case.')
 	
 if __name__ == '__main__':
 	pretty_center_print('---------------------------------------------------------------')
@@ -303,6 +474,7 @@ if __name__ == '__main__':
 	pretty_center_print('A game about finding life in death')
 	pretty_center_print('V 1.0\tAuthor: Jake Meacham')
 	pretty_center_print('Type \'help\' for a list of commands.')
-	list_places()
+	print
+	checkAll()
 	adventureConsole().cmdloop()
 	print('Fin')
