@@ -119,10 +119,10 @@ worldPlaces = {
 		EAST: 'East Graveyard Path',
 		LOCKED: False},
 	'East Graveyard Path': {
-		DESC: 'You walk down the path to the east, treading lightly so as to not disturb the gravel beneath your feet.',
+		DESC: 'You walk down the path to the east, treading lightly so as to not disturb the gravel beneath your feet. The path you are walking on is thin and overgrown. A few headstones sit on the sides of the path.',
 		PEOPLE: [],
-		DECEASED: ['Joseph Orazio'],
-		UNDERGROUND: ['Joseph Orazio\'s Watch'],
+		DECEASED: ['Joseph Orazio\'s Corpse'],
+		UNDERGROUND: ['Silver Watch'],
 		GROUND: ['Joseph Orazio\'s Gravestone'],
 		WEST: 'Heathervale Graveyard',
 		LOCKED: False}
@@ -133,7 +133,7 @@ peopleList = {
 		SHORTDESC: 'You are an emaciated young woman with piercing blue eyes and pale white skin, short in stature. Your hair is black and haphazardly cut to neck length. You are wearing a black shirt and pants you fashioned yourself in order to move silently at night without being seen.',},
 }
 deceasedPeopleList = {
-	'Joseph Orazio': {
+	'Joseph Orazio\'s Corpse': {
 		SHORTDESC: 'Joseph Orazio, son of Barbera Orazio, died May 18, 1892. He was 24. The cause of death was exhaustion in the heat of the sun, as confirmed by his brothers working with him in the fields. He was an excellent farmhand and cared for his family. He was buried on the East side of the Heathervale graveyard. He is survived by his wife, Sera.',
 		DUGUP: False },
 }
@@ -158,6 +158,9 @@ itemList = {
 	'Joseph Orazio\'s Gravestone': {
 		SHORTDESC: 'A small headstone. A solitary daisy lies on the ground at its base.',
 		DESC: 'JosephOrazio\n1868 - 1892',
+		TAKEABLE: False },
+	'Silver Watch': {
+		SHORTDESC: 'Joseph Orazio\'s most prized possession, a silver pocketwatch given to him by his father.',
 		TAKEABLE: False }
 	}
 
@@ -265,8 +268,10 @@ def dig():
 		for item in worldPlaces[currLocation][UNDERGROUND]:
 			worldPlaces[currLocation][UNDERGROUND].remove(item)
 			worldPlaces[currLocation][GROUND].append(item)
+			pretty_print(item + ' dug up.')
 		for dp in worldPlaces[currLocation][DECEASED]:
 			deceasedPeopleList[dp][DUGUP] = True
+			pretty_print(dp + ' dug up.')
 
 def examine(arg):
 	if arg == '':
@@ -282,11 +287,19 @@ def examine(arg):
 				return
 	for person in (worldPlaces[currLocation][PEOPLE] + ['Self']):
 		if arg in person:
-			if DESC in itemList[item]:
+			if DESC in peopleList[person]:
 				pretty_print(person + ': ' + peopleList[person][DESC] + '\n')
 				return
 			else:
 				pretty_print(person + ': ' + peopleList[person][SHORTDESC] + '\n')
+				return
+	for dp in (worldPlaces[currLocation][DECEASED]):
+		if arg in dp:
+			if DESC in deceasedPeopleList[dp]:
+				pretty_print(dp + ': ' + deceasedPeopleList[person][DESC] + '\n')
+				return
+			else:
+				pretty_print(dp + ': ' + deceasedPeopleList[person][SHORTDESC] + '\n')
 				return
 	pretty_print('There isn\'t anything like that to look at.')
 
@@ -304,7 +317,7 @@ def look(arg):
 				pretty_print(' -' + item)
 			for dp in worldPlaces[currLocation][DECEASED]:
 				if deceasedPeopleList[dp][DUGUP] == True:
-					pretty_print(' -' + dp + '\'s Corpse') #FIGURE OUT HOW TO GET ENGINE TO RESPECT THE WORD CORPSE
+					pretty_print(' -' + dp)
 		if len(worldPlaces[currLocation][PEOPLE]) == 0 and len(worldPlaces[currLocation][GROUND]) == 0:
 			pretty_print('There\'s nothing of interest here.')
 		return
@@ -326,7 +339,16 @@ def look(arg):
 				pretty_print('You\'ll have to be more specific.')
 				return
 			personToExamine = person
-	if itemToExamine is not '' and personToExamine is not '':
+	i = 0
+	dpToExamine = ''
+	for dp in (worldPlaces[currLocation][DECEASED]):
+		if arg in dp:
+			i += 1
+			if i > 1:
+				pretty_print('You\'ll have to be more specific.')
+				return
+			dpToExamine = dp
+	if (itemToExamine is not '' and personToExamine is not '') or (itemToExamine is not '' and dpToExamine is not '') or (dpToExamine is not '' and personToExamine is not ''):
 		pretty_print('You\'ll have to be more specific.')
 		return
 	if itemToExamine is not '':
@@ -334,6 +356,9 @@ def look(arg):
 		return
 	if personToExamine is not '':
 		pretty_print(person + ': ' + peopleList[personToExamine][SHORTDESC] + '\n')
+		return
+	if dpToExamine is not '':
+		pretty_print(dp + ': ' + deceasedPeopleList[dpToExamine][SHORTDESC] + '\n')
 		return
 	pretty_print('There isn\'t anything like that to look at.')
 	
@@ -348,6 +373,14 @@ def take(arg):
 				take_item(item)
 			else:
 				pretty_print('You can\'t take this item.')
+			return
+	for person in worldPlaces[currLocation][PEOPLE]:
+		if arg in person:
+			pretty_print('You can\'t just take people.')
+			return
+	for dp in worldPlaces[currLocation][DECEASED]:
+		if arg in dp:
+			pretty_print('You\'re a necromancer, not a necrophiliac.')
 			return
 	pretty_print(arg + ' can\'t be picked up.')
 
