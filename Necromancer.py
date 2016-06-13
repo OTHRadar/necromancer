@@ -5,8 +5,11 @@ SHORTDESC = 'shortdesc'
 TAKEABLE = 'takeable'
 PLACES = 'places'
 PEOPLE = 'people'
+DIALOG = 'dialog'
 DECEASED = 'deceased'
 DUGUP = 'dugup'
+REANIMATED = 'reanimated'
+REANIMATOR = 'reanimator'
 GROUND = 'ground'
 UNDERGROUND = 'underground'
 NORTH = 'north'
@@ -71,6 +74,7 @@ worldPlaces = {
 	'The Condemned Museum\'s Atrium': {
 		DESC: 'You find yourself in a large, dark atrium. The skylight above is streaked with dust and dirt. Soft rays of light cut their way through, illuminating sections of the worn, concrete floor. Debris is strewn about haphazardly, and a thick layer of dust sits on most of the exhibits. The centerpiece of the room is a statue of the founder of the town of Heathervale, Charles Alfred, most of which now lies crumbled on the floor.',
 		PEOPLE: [],
+		DECEASED: [],
 		GROUND: [],
 		NORTH: 'The Condemned Museum\'s Records Room',
 		SOUTH: 'The Condemned Museum\'s Courtyard',
@@ -78,12 +82,14 @@ worldPlaces = {
 	'The Condemned Museum\'s Records Room': {
 		DESC: 'The air in the records room is thick with the smell of dusty old books. Rows of shelves fill the area, and stacks of books can be found gathering cobwebs in the corners. The room is dimly lit by an oil lamp sitting on a desk next to the door.',
 		PEOPLE: [],
+		DECEASED: [],
 		GROUND: ['Book - Obituaries, 1890 - 1900', 'Book - Necronomicon'],
 		SOUTH: 'The Condemned Museum\'s Atrium',
 		LOCKED: False},
 	'The Condemned Museum\'s Courtyard': {
 		DESC:'The cold night air assails you as you leave the museum. It carries with it the stench of wet livestock, from the farms of nearby Heathervale. Crumbled stone benches surround a fountain in which stagnant water is pooling from the recent rain.',
 		PEOPLE: [],
+		DECEASED: [],
 		GROUND: [],
 		NORTH: 'The Condemned Museum\'s Atrium',
 		EAST: 'Heathervale Town Square',
@@ -91,6 +97,7 @@ worldPlaces = {
 	'Heathervale Town Square': {
 		DESC:'You enter the town square. The shops and streets lie abandoned as everyone has turned in for the night. The streets are cobbled and well-maintaned, though weeds are beginning to emerge from the cracks.',
 		PEOPLE: [],
+		DECEASED: [],
 		GROUND: [],
 		WEST: 'The Condemned Museum\'s Courtyard',
 		SOUTH: 'Old Mary\'s Farm',
@@ -99,6 +106,7 @@ worldPlaces = {
 	'Old Mary\'s Farm': {
 		DESC:'Blah farm.',
 		PEOPLE: [],
+		DECEASED: [],
 		GROUND:[],
 		NORTH:'Heathervale Town Square',
 		WEST:'Old Mary\'s Farmhouse',
@@ -106,12 +114,14 @@ worldPlaces = {
 	'Old Mary\'s Farmhouse': {
 		DESC: 'A small yellow house with white trim. The paint is cracking and peeling, and has lost its luster. An ornamental windmill sits next to the house, slowly rotating in the wind.',
 		PEOPLE: [],
+		DECEASED: [],
 		GROUND: ['Spade'],
 		EAST:'Old Mary\'s Farm',
 		LOCKED: False},
 	'Heathervale Graveyard': {
 		DESC: 'The gate to the graveyard creaks slightly as you push it open. The lawn is dotted with trees and bushes, and headstones line the three paths splitting from the entrance. A small shack lies at the end of the path to the North.',
 		PEOPLE: [],
+		DECEASED: [],
 		GROUND: [],
 		WEST: 'Heathervale Town Square',
 		NORTH: 'North Graveyard Path',
@@ -135,7 +145,10 @@ peopleList = {
 deceasedPeopleList = {
 	'Joseph Orazio\'s Corpse': {
 		SHORTDESC: 'Joseph Orazio, son of Barbera Orazio, died May 18, 1892. He was 24. The cause of death was exhaustion in the heat of the sun, as confirmed by his brothers working with him in the fields. He was an excellent farmhand and cared for his family. He was buried on the East side of the Heathervale graveyard. He is survived by his wife, Sera.',
-		DUGUP: False },
+		DUGUP: False,
+		REANIMATED: False,
+		REANIMATOR: 'Silver Watch',
+		DIALOG: ['ooga','booga','booga']},
 }
 obituaryLongDesc = ''
 
@@ -161,7 +174,7 @@ itemList = {
 		TAKEABLE: False },
 	'Silver Watch': {
 		SHORTDESC: 'Joseph Orazio\'s most prized possession, a silver pocketwatch given to him by his father.',
-		TAKEABLE: False }
+		TAKEABLE: True }
 	}
 
 def pretty_print(text):
@@ -253,6 +266,14 @@ def talk(arg):
 				pretty_print('\"' + peopleList[person][DIALOG][peopleList[person][DNUM]] + '\"')
 				peopleList[person][DNUM] += 1
 			return
+	for dp in worldPlaces[currLocation][DECEASED]:
+		if arg in dp:
+			if deceasedPeopleList[dp][DNUM] >= len(deceasedPeopleList[dp][DIALOG]):
+				pretty_print('They don\'t have anything more to say.')
+			else:
+				pretty_print('\"' + deceasedPeopleList[dp][DIALOG][deceasedPeopleList[dp][DNUM]] + '\"')
+				deceasedPeopleList[dp][DNUM] += 1
+			return
 	pretty_print('Nobody named ' + arg + ' could be found at this location.')
 
 def show_inventory():
@@ -272,6 +293,34 @@ def dig():
 		for dp in worldPlaces[currLocation][DECEASED]:
 			deceasedPeopleList[dp][DUGUP] = True
 			pretty_print(dp + ' dug up.')
+			
+def reanimate(arg):
+	if ' With ' not in arg:
+		print_check_usage()
+		return
+	argarray = arg.split(' With ')
+	arg1 = argarray[0]
+	arg2 = argarray[1]
+	print '\'' + arg1 + '\''
+	exists = False
+	for item in inventory:
+		if (arg2 in item):
+			exists = True
+	if not exists:
+		pretty_print('You don\'t have any items like that.')
+		return
+	for dp in worldPlaces[currLocation][DECEASED]:
+		if deceasedPeopleList[dp][DUGUP] == True and arg in deceasedPeopleList[dp]:
+			if arg2 in deceasedPeopleList[dp][REANIMATOR]:
+				pretty_print('Reanimation succesful.') #FIGURE OUT WHY REANIMATION IS FAILING
+				deceasedPeopleList[dp][REANIMATED] = True
+				inventory.remove(arg2)
+				return
+			else:
+				pretty_print('Reanimation failed. Try again.')
+				return
+	pretty_print('There\'s no one like that here.')
+			
 
 def examine(arg):
 	if arg == '':
@@ -382,7 +431,7 @@ def take(arg):
 		if arg in dp:
 			pretty_print('You\'re a necromancer, not a necrophiliac.')
 			return
-	pretty_print(arg + ' can\'t be picked up.')
+	pretty_print('There\'s nothing like that here.')
 
 def drop(arg):
 	for item in inventory:
@@ -397,6 +446,9 @@ def drop(arg):
 				print 'Dropped.'
 				return
 	pretty_print('Nothing like that could be dropped.')
+
+def print_check_usage():
+	pretty_print('Unable to execute command. Check usage.')
 	
 def go_helper(arg):
 	dest = ''
@@ -415,9 +467,16 @@ def go_helper(arg):
 		pretty_print('That\'s not a valid direction. Try NORTH, SOUTH, EAST, or WEST.')
 	
 class adventureConsole(cmd.Cmd):
+	
 	prompt = '\n> '
 	doc_header = 'Commands are documented below. Type \'help commands\' to learn how to use them.\n'
 	ruler = ''
+	def cmdloop(self):
+		try:
+			cmd.Cmd.cmdloop(self)
+		except TypeError as e:
+			print_check_usage()
+			self.cmdloop()
 	def default(self, arg):
 		print
 		pretty_print('That isn\'t a valid command. Type \'help\' for a list of commands.')
@@ -447,6 +506,11 @@ class adventureConsole(cmd.Cmd):
 		dig()
 	def help_dig(self):
 		pretty_print('Use items like shovels and spades.')
+	def do_reanimate(self, arg):
+		reanimate(arg.title())
+	def help_reanimate(self):
+		pretty_print('Usage: reanimate <person> <item>')
+		pretty_print('Performs a ceremony with the given item to reanimate the corpse.')	
 	def do_talk(self, arg):
 		print
 		talk(arg.title())
