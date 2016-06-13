@@ -121,7 +121,7 @@ worldPlaces = {
 	'East Graveyard Path': {
 		DESC: 'You walk down the path to the east, treading lightly so as to not disturb the gravel beneath your feet.',
 		PEOPLE: [],
-		DECEASED: ['Joseph Orazio'],
+		DECEASED: ['Joseph Orazio\'s Corpse'],
 		UNDERGROUND: ['Joseph Orazio\'s Watch'],
 		GROUND: ['Joseph Orazio\'s Gravestone'],
 		WEST: 'Heathervale Graveyard',
@@ -304,7 +304,7 @@ def look(arg):
 				pretty_print(' -' + item)
 			for dp in worldPlaces[currLocation][DECEASED]:
 				if deceasedPeopleList[dp][DUGUP] == True:
-					pretty_print(' -' + dp + '\'s Corpse') #FIGURE OUT HOW TO GET ENGINE TO RESPECT THE WORD CORPSE
+					pretty_print(' -' + dp)
 		if len(worldPlaces[currLocation][PEOPLE]) == 0 and len(worldPlaces[currLocation][GROUND]) == 0:
 			pretty_print('There\'s nothing of interest here.')
 		return
