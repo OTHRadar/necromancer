@@ -18,7 +18,8 @@ EAST = 'east'
 WEST = 'west'
 SCREEN_WIDTH = 75
 LOCKED = 'locked'
-currLocation = 'The Condemned Museum\'s Atrium'
+READ = 'read'
+currLocation = 'The Condemned Museum\'s Records Room'
 
 inventory = []
 
@@ -66,13 +67,16 @@ Options:
 
 '''
 
+#K.W. -> Khan Me'el
+#A.L. -> Aloran Loche
+
 def set_curr_location(location):
 	global currLocation
 	currLocation = location
 
 worldPlaces = {
 	'The Condemned Museum\'s Atrium': {
-		DESC: 'You find yourself in a large, dark atrium. The skylight above is streaked with dust and dirt. Soft rays of light cut their way through, illuminating sections of the worn, concrete floor. Debris is strewn about haphazardly, and a thick layer of dust sits on most of the exhibits. The centerpiece of the room is a statue of the founder of the town of Heathervale, Charles Alfred, most of which now lies crumbled on the floor.',
+		DESC: 'The skylight above is streaked with dust and dirt. Soft rays of light cut their way through, illuminating sections of the worn, concrete floor. Debris is strewn about haphazardly, and a thick layer of dust sits on most of the exhibits. The centerpiece of the room is a statue of the founder of the town of Heathervale, Charles Alfred, most of which now lies crumbled on the floor.',
 		PEOPLE: [],
 		DECEASED: [],
 		GROUND: [],
@@ -80,7 +84,7 @@ worldPlaces = {
 		SOUTH: 'The Condemned Museum\'s Courtyard',
 		LOCKED: False},
 	'The Condemned Museum\'s Records Room': {
-		DESC: 'The air in the records room is thick with the smell of dusty old books. Rows of shelves fill the area, and stacks of books can be found gathering cobwebs in the corners. The room is dimly lit by an oil lamp sitting on a desk next to the door.',
+		DESC: 'You find yourself in a small, musty room. The air is thick with the smell of dusty old books. Rows of shelves fill the area, and stacks of books can be found gathering cobwebs in the corners. The room is dimly lit by an oil lamp sitting on a desk next to the door.',
 		PEOPLE: [],
 		DECEASED: [],
 		GROUND: ['Book - Obituaries, 1890 - 1900', 'Book - Necronomicon'],
@@ -150,23 +154,25 @@ deceasedPeopleList = {
 		REANIMATOR: 'Silver Watch',
 		DIALOG: ['ooga','booga','booga']},
 }
-obituaryLongDesc = ''
 
 def getObituaryLongDesc():
+	obit = ''
 	for p in deceasedPeopleList:
-		obituaryLongDesc += p + ' ' + peopleList[p][SHORTDESC] + '\n'
+		obit += p[0:p.index('\'')] + ': ' + deceasedPeopleList[p][SHORTDESC] + '\n'
+	return obit
 	
 itemList = {
 	'Book - Necronomicon': {
 		SHORTDESC: 'A book bound in black velvet with silver markings inscribed upon the cover.',
 		DESC: 'A book bound in black velvet with silver markings inscribed upon the cover. It is filled with detailed descriptions of necromancy and other rituals surrounding death. The pages are marked heavily with notes.',
+		READ: '\nThis unholy manuscript endeavors in its entirety to impress upon the reader such knowledge so as to speak (and even bring life) to the resting spirits of men. Here within lie the writings of the great conjurer K.W. as he himself inscribed them upon his deathbed. He so accurately predicted his departure; not a second after the last drop of ink from his pen spilled forth he slumped soundlessly into his chair, leaving to us those whispers the great Divine himself kept secret from men. Upon myself I have taken the burden of distilling this work to its barest necessities, and it is with pleasure that I present here the fruits of my labor. Take heed and read on with prudence, for the details of ceremony may mean the difference between life and death. Tread not lightly on this path, for in the practice of black magick, diligence alone keeps one from death.\n\n1. One must first of course acquire some piece of flesh or bone of he you wish to call upon.\n\n2. A part or parcel dear to them must be collected too, for an offering must be made to entice the spirit forth.\n\n3. Once gathered one must sit alone inside a circle inscribed with an upturned 5-point star, both parcel and flesh at either side. Against one\'s back inscribe a cross and leave an untouched sacrament of wine and bread, that the spirit may not play upon you a trick from your behind.\n\n4. Say aloud in voice unwavering the incantation \'Carmina haec sunt verba inania ignotus incantatum.\' and then keep utter silence.\n\n5. Once a quarter minute you have thus remained, the spirit shall appear as though in human form.\n\nThus in so many more words K.W. instructs the intrigued reader. I assure you I have missed nothing of import. Godspeed you, acolyte of the dark path. Iter in pace. - A.L',
 		TAKEABLE: True},
 	'Spade': {
 		SHORTDESC: 'A rusty old spade with a wooden handle and an iron tip.',
 		TAKEABLE: True},
 	'Book - Obituaries, 1890 - 1900': {
 		SHORTDESC: 'A large book of obituaries. It is heavy in your hand.',
-		DESC: obituaryLongDesc,
+		READ: 'obituaryLongDesc',
 		TAKEABLE: False },
 	'Joseph Orazio\'s Gravestone': {
 		SHORTDESC: 'A small headstone. A solitary daisy lies on the ground at its base.',
@@ -285,6 +291,9 @@ def show_inventory():
 			pretty_print(item + ': ' + itemList[item][SHORTDESC] + '\n')
 		
 def dig():
+	if not 'Spade' in inventory:
+		pretty_print('You don\'t have anything to dig with.')
+		return
 	if UNDERGROUND in worldPlaces[currLocation] or DECEASED in worldPlaces[currLocation]:
 		for item in worldPlaces[currLocation][UNDERGROUND]:
 			worldPlaces[currLocation][UNDERGROUND].remove(item)
@@ -295,26 +304,29 @@ def dig():
 			pretty_print(dp + ' dug up.')
 			
 def reanimate(arg):
+	inInventory = False
 	if ' With ' not in arg:
 		print_check_usage()
 		return
 	argarray = arg.split(' With ')
 	arg1 = argarray[0]
 	arg2 = argarray[1]
-	print '\'' + arg1 + '\''
 	exists = False
-	for item in inventory:
+	for item in (inventory + worldPlaces[currLocation][GROUND]):
 		if (arg2 in item):
 			exists = True
+			if item in inventory:
+				inInventory = True
 	if not exists:
 		pretty_print('You don\'t have any items like that.')
 		return
 	for dp in worldPlaces[currLocation][DECEASED]:
-		if deceasedPeopleList[dp][DUGUP] == True and arg in deceasedPeopleList[dp]:
+		if deceasedPeopleList[dp][DUGUP] == True and arg1 in dp:
 			if arg2 in deceasedPeopleList[dp][REANIMATOR]:
 				pretty_print('Reanimation succesful.') #FIGURE OUT WHY REANIMATION IS FAILING
 				deceasedPeopleList[dp][REANIMATED] = True
-				inventory.remove(arg2)
+				if inInventory:
+					inventory.remove(arg2)
 				return
 			else:
 				pretty_print('Reanimation failed. Try again.')
@@ -330,10 +342,16 @@ def examine(arg):
 		if arg in item:
 			if DESC in itemList[item]:
 				pretty_print(item + ': ' + itemList[item][DESC] + '\n')
-				return
 			else:
 				pretty_print(item + ': ' + itemList[item][SHORTDESC] + '\n')
-				return
+			if READ in itemList[item]:
+				yn = ''
+				while yn != 'Y' and yn != 'N':
+					yn = raw_input('Read Book? (y/n): ')
+					yn = yn.title()
+				if yn == 'Y':
+					read(item)
+			return
 	for person in (worldPlaces[currLocation][PEOPLE] + ['Self']):
 		if arg in person:
 			if DESC in peopleList[person]:
@@ -352,6 +370,20 @@ def examine(arg):
 				return
 	pretty_print('There isn\'t anything like that to look at.')
 
+def read(arg):
+	if arg == '':
+		pretty_print('What are you reading?')
+		return
+	for item in (inventory + worldPlaces[currLocation][GROUND]):
+		if arg in item:
+			if READ in itemList[item]:
+				if 'obituaryLongDesc' in itemList[item][READ]:
+					pretty_print(getObituaryLongDesc())
+					return
+				pretty_print(item + ': ' + itemList[item][READ] + '\n')
+			return
+	pretty_print('That isn\'t a book.')
+	
 def look(arg):
 	if arg == '':
 		if len(worldPlaces[currLocation][PEOPLE]) > 0:
@@ -412,6 +444,7 @@ def look(arg):
 	pretty_print('There isn\'t anything like that to look at.')
 	
 def take(arg):
+	itemTaken = False
 	if arg == '':
 		pretty_print('What are you taking?')
 		return
@@ -420,18 +453,18 @@ def take(arg):
 			if itemList[item][TAKEABLE]:
 				pretty_print('Taken.')
 				take_item(item)
-			else:
-				pretty_print('You can\'t take this item.')
-			return
+				itemTaken = True
+				return
 	for person in worldPlaces[currLocation][PEOPLE]:
 		if arg in person:
-			pretty_print('You can\'t just take people.')
+			pretty_print('You can\'t just take people. It\'s indecent.')
 			return
 	for dp in worldPlaces[currLocation][DECEASED]:
 		if arg in dp:
 			pretty_print('You\'re a necromancer, not a necrophiliac.')
 			return
-	pretty_print('There\'s nothing like that here.')
+	pretty_print('You can\'t take this item.')
+	return
 
 def drop(arg):
 	for item in inventory:
@@ -498,6 +531,9 @@ class adventureConsole(cmd.Cmd):
 	def do_location(self, arg):
 		print
 		display_place_info(currLocation)
+	def do_loc(self, arg):
+		print
+		display_place_info(currLocation)
 	def help_location(self):
 		print
 		pretty_print('Shows information on the current location.')
@@ -546,6 +582,13 @@ class adventureConsole(cmd.Cmd):
 	def do_examine(self, arg):
 		print
 		examine(arg.title())
+	def do_read(self, arg):
+		print
+		read(arg.title())
+	def help_read(self, arg):
+		print
+		pretty_print('Usage: read <book>')
+		pretty_print('Read a book.')
 	def help_examine(self):
 		print
 		pretty_print('Usage: examine <item>  OR  examine <person>')
