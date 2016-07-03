@@ -6,6 +6,7 @@ TAKEABLE = 'takeable'
 PLACES = 'places'
 PEOPLE = 'people'
 DIALOG = 'dialog'
+DNUM = 'dnum'
 DECEASED = 'deceased'
 DUGUP = 'dugup'
 REANIMATED = 'reanimated'
@@ -16,6 +17,7 @@ NORTH = 'north'
 SOUTH = 'south'
 EAST = 'east'
 WEST = 'west'
+END = 'end'
 SCREEN_WIDTH = 75
 LOCKED = 'locked'
 READ = 'read'
@@ -68,7 +70,7 @@ Options:
 '''
 
 #K.W. -> Khan Me'el
-#A.L. -> Aloran Loche
+#A.O. -> Aloran Orazio
 
 def set_curr_location(location):
 	global currLocation
@@ -144,15 +146,16 @@ worldPlaces = {
 	
 peopleList = {
 	'Self': {
-		SHORTDESC: 'You are an emaciated young woman with piercing blue eyes and pale white skin, short in stature. Your hair is black and haphazardly cut to neck length. You are wearing a black shirt and pants you fashioned yourself in order to move silently at night without being seen.',},
+		SHORTDESC: 'You are Katya Orazio, an emaciated young woman with piercing blue eyes and pale white skin, short in stature. Your hair is black and haphazardly cut to neck length. You are wearing a black shirt and pants you fashioned yourself in order to move silently at night without being seen.',},
 }
 deceasedPeopleList = {
 	'Joseph Orazio\'s Corpse': {
-		SHORTDESC: 'Joseph Orazio, son of Barbera Orazio, died May 18, 1892. He was 24. The cause of death was exhaustion in the heat of the sun, as confirmed by his brothers working with him in the fields. He was an excellent farmhand and cared for his family. He was buried on the East side of the Heathervale graveyard. He is survived by his wife, Sera.',
+		SHORTDESC: 'Joseph Orazio, son of Barbera Orazio, died May 18, 1892. He was 24. The cause of death was exhaustion in the heat of the sun, as confirmed by his brothers working with him in the fields. He was an educated man, an excellent farmhand and cared for his family. He was buried on the East side of the Heathervale graveyard. He is survived by his wife, Sera.',
 		DUGUP: False,
 		REANIMATED: False,
 		REANIMATOR: 'Silver Watch',
-		DIALOG: ['ooga','booga','booga']},
+		DIALOG:  ['Hello there. I\'m Katya. Pleased to meet you. Don\'t be alarmed.','Perhaps alarmed is not the right word. You\'ve defiled my grave, but, then, I\'ve long since lost my pride in worldly things. Tell me, why is it you have summoned me?','I wish to know of your life.','Ah, it is not my life, but my death which is most interesting. My brothers spoke of heatstroke, oh how their lies taint their lips! Murdered by one\'s own kin... And none other than your Uncle Timothy himself struck the killing blow!'],
+		DNUM: 0}
 }
 
 def getObituaryLongDesc():
@@ -165,7 +168,7 @@ itemList = {
 	'Book - Necronomicon': {
 		SHORTDESC: 'A book bound in black velvet with silver markings inscribed upon the cover.',
 		DESC: 'A book bound in black velvet with silver markings inscribed upon the cover. It is filled with detailed descriptions of necromancy and other rituals surrounding death. The pages are marked heavily with notes.',
-		READ: '\nThis unholy manuscript endeavors in its entirety to impress upon the reader such knowledge so as to speak (and even bring life) to the resting spirits of men. Here within lie the writings of the great conjurer K.W. as he himself inscribed them upon his deathbed. He so accurately predicted his departure; not a second after the last drop of ink from his pen spilled forth he slumped soundlessly into his chair, leaving to us those whispers the great Divine himself kept secret from men. Upon myself I have taken the burden of distilling this work to its barest necessities, and it is with pleasure that I present here the fruits of my labor. Take heed and read on with prudence, for the details of ceremony may mean the difference between life and death. Tread not lightly on this path, for in the practice of black magick, diligence alone keeps one from death.\n\n1. One must first of course acquire some piece of flesh or bone of he you wish to call upon.\n\n2. A part or parcel dear to them must be collected too, for an offering must be made to entice the spirit forth.\n\n3. Once gathered one must sit alone inside a circle inscribed with an upturned 5-point star, both parcel and flesh at either side. Against one\'s back inscribe a cross and leave an untouched sacrament of wine and bread, that the spirit may not play upon you a trick from your behind.\n\n4. Say aloud in voice unwavering the incantation \'Carmina haec sunt verba inania ignotus incantatum.\' and then keep utter silence.\n\n5. Once a quarter minute you have thus remained, the spirit shall appear as though in human form.\n\nThus in so many more words K.W. instructs the intrigued reader. I assure you I have missed nothing of import. Godspeed you, acolyte of the dark path. Iter in pace. - A.L',
+		READ: '\nThis unholy manuscript endeavors in its entirety to impress upon the reader such knowledge so as to speak (and even bring life) to the resting spirits of men. Here within lie the writings of the great conjurer K.W. as he himself inscribed them upon his deathbed. He so accurately predicted his departure; not a second after the last drop of ink from his pen spilled forth he slumped soundlessly into his chair, leaving to us those whispers the great Divine himself kept secret from men. Upon myself I have taken the burden of distilling this work to its barest necessities, and it is with pleasure that I present here the fruits of my labor. Take heed and read on with prudence, for the details of ceremony may mean the difference between life and death. Tread not lightly on this path, for in the practice of black magick, diligence alone keeps one from death.\n\n1. One must first of course acquire some piece of flesh or bone of he you wish to call upon.\n\n2. A part or parcel dear to them must be collected too, for an offering must be made to entice the spirit forth.\n\n3. Once gathered one must sit alone inside a circle inscribed with an upturned 5-point star, both parcel and flesh at either side. Against one\'s back inscribe a cross and leave an untouched sacrament of wine and bread, that the spirit may not play upon you a trick from your behind.\n\n4. Say aloud in voice unwavering the incantation \'Carmina haec sunt verba inania ignotus incantatum.\' and then keep utter silence.\n\n5. Once a quarter minute you have thus remained, the spirit shall appear as though in human form.\n\n6. Some spirits will be eager to work with you, others may be timid, or even angered by your presence. Each interaction must be handled in its course, and no two spirits are the same.\n\nThus in so many more words K.W. instructs the intrigued reader. I assure you I have missed nothing of import. Godspeed you, acolyte of the dark path. Iter in pace. - A.O.',
 		TAKEABLE: True},
 	'Spade': {
 		SHORTDESC: 'A rusty old spade with a wooden handle and an iron tip.',
@@ -258,6 +261,7 @@ def quit_game():
 			return
 				
 def talk(arg):
+	#TODO: FIX TO MEET NEW DISCUSSION PARADIGM (2 people talking, not one)
 	if arg == '':
 		pretty_print('Who are you talking to?')
 		return
@@ -267,7 +271,8 @@ def talk(arg):
 	for person in worldPlaces[currLocation][PEOPLE]:
 		if arg in person:
 			if peopleList[person][DNUM] >= len(peopleList[person][DIALOG]):
-				pretty_print('They don\'t have anything more to say.')
+				deceasedPeopleList[dp][DNUM] = 0
+				talk(arg)
 			else:
 				pretty_print('\"' + peopleList[person][DIALOG][peopleList[person][DNUM]] + '\"')
 				peopleList[person][DNUM] += 1
@@ -275,7 +280,8 @@ def talk(arg):
 	for dp in worldPlaces[currLocation][DECEASED]:
 		if arg in dp:
 			if deceasedPeopleList[dp][DNUM] >= len(deceasedPeopleList[dp][DIALOG]):
-				pretty_print('They don\'t have anything more to say.')
+				deceasedPeopleList[dp][DNUM] = 0
+				talk(arg)
 			else:
 				pretty_print('\"' + deceasedPeopleList[dp][DIALOG][deceasedPeopleList[dp][DNUM]] + '\"')
 				deceasedPeopleList[dp][DNUM] += 1
@@ -305,6 +311,7 @@ def dig():
 			
 def reanimate(arg):
 	inInventory = False
+	dropItem = ''
 	if ' With ' not in arg:
 		print_check_usage()
 		return
@@ -317,6 +324,7 @@ def reanimate(arg):
 			exists = True
 			if item in inventory:
 				inInventory = True
+				dropItem = item
 	if not exists:
 		pretty_print('You don\'t have any items like that.')
 		return
@@ -326,7 +334,7 @@ def reanimate(arg):
 				pretty_print('Reanimation succesful.') #FIGURE OUT WHY REANIMATION IS FAILING
 				deceasedPeopleList[dp][REANIMATED] = True
 				if inInventory:
-					inventory.remove(arg2)
+					inventory.remove(dropItem)
 				return
 			else:
 				pretty_print('Reanimation failed. Try again.')
