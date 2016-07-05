@@ -5,8 +5,6 @@ SHORTDESC = 'shortdesc'
 TAKEABLE = 'takeable'
 PLACES = 'places'
 PEOPLE = 'people'
-DIALOG = 'dialog'
-DNUM = 'dnum'
 DECEASED = 'deceased'
 DUGUP = 'dugup'
 REANIMATED = 'reanimated'
@@ -82,14 +80,16 @@ worldPlaces = {
 		PEOPLE: [],
 		DECEASED: [],
 		GROUND: [],
+		UNDERGROUND: [],
 		NORTH: 'The Condemned Museum\'s Records Room',
 		SOUTH: 'The Condemned Museum\'s Courtyard',
 		LOCKED: False},
 	'The Condemned Museum\'s Records Room': {
-		DESC: 'You find yourself in a small, musty room. The air is thick with the smell of dusty old books. Rows of shelves fill the area, and stacks of books can be found gathering cobwebs in the corners. The room is dimly lit by an oil lamp sitting on a desk next to the door.',
+		DESC: 'You find yourself in a small, musty room. The air is thick with the smell of dusty old books. Rows of shelves fill the area, and stacks of paper can be found gathering cobwebs in the corners. The room is dimly lit by an oil lamp sitting on a desk next to the door. Beside the lamp is a book bound in black velvet.',
 		PEOPLE: [],
 		DECEASED: [],
 		GROUND: ['Book - Obituaries, 1890 - 1900', 'Book - Necronomicon'],
+		UNDERGROUND: [],
 		SOUTH: 'The Condemned Museum\'s Atrium',
 		LOCKED: False},
 	'The Condemned Museum\'s Courtyard': {
@@ -97,6 +97,7 @@ worldPlaces = {
 		PEOPLE: [],
 		DECEASED: [],
 		GROUND: [],
+		UNDERGROUND: [],
 		NORTH: 'The Condemned Museum\'s Atrium',
 		EAST: 'Heathervale Town Square',
 		LOCKED: False},
@@ -105,6 +106,7 @@ worldPlaces = {
 		PEOPLE: [],
 		DECEASED: [],
 		GROUND: [],
+		UNDERGROUND: [],
 		WEST: 'The Condemned Museum\'s Courtyard',
 		SOUTH: 'Old Mary\'s Farm',
 		EAST: 'Heathervale Graveyard',
@@ -114,6 +116,7 @@ worldPlaces = {
 		PEOPLE: [],
 		DECEASED: [],
 		GROUND:[],
+		UNDERGROUND: [],
 		NORTH:'Heathervale Town Square',
 		WEST:'Old Mary\'s Farmhouse',
 		LOCKED: False},
@@ -122,6 +125,7 @@ worldPlaces = {
 		PEOPLE: [],
 		DECEASED: [],
 		GROUND: ['Spade'],
+		UNDERGROUND: [],
 		EAST:'Old Mary\'s Farm',
 		LOCKED: False},
 	'Heathervale Graveyard': {
@@ -129,6 +133,7 @@ worldPlaces = {
 		PEOPLE: [],
 		DECEASED: [],
 		GROUND: [],
+		UNDERGROUND: [],
 		WEST: 'Heathervale Town Square',
 		NORTH: 'North Graveyard Path',
 		SOUTH: 'South Graveyard Path',
@@ -137,7 +142,7 @@ worldPlaces = {
 	'East Graveyard Path': {
 		DESC: 'You walk down the path to the east, treading lightly so as to not disturb the gravel beneath your feet. The path you are walking on is thin and overgrown. A few headstones sit on the sides of the path.',
 		PEOPLE: [],
-		DECEASED: ['Joseph Orazio\'s Corpse'],
+		DECEASED: ['Joseph Orazio'],
 		UNDERGROUND: ['Silver Watch'],
 		GROUND: ['Joseph Orazio\'s Gravestone'],
 		WEST: 'Heathervale Graveyard',
@@ -146,16 +151,14 @@ worldPlaces = {
 	
 peopleList = {
 	'Self': {
-		SHORTDESC: 'You are Katya Orazio, an emaciated young woman with piercing blue eyes and pale white skin, short in stature. Your hair is black and haphazardly cut to neck length. You are wearing a black shirt and pants you fashioned yourself in order to move silently at night without being seen.',},
+		SHORTDESC: 'You are Katya, an emaciated young woman with piercing blue eyes and pale white skin, short in stature. Your hair is black and haphazardly cut to neck length. You are wearing a black shirt and pants, which are worn and tearing in places.',},
 }
 deceasedPeopleList = {
-	'Joseph Orazio\'s Corpse': {
-		SHORTDESC: 'Joseph Orazio, son of Barbera Orazio, died May 18, 1892. He was 24. The cause of death was exhaustion in the heat of the sun, as confirmed by his brothers working with him in the fields. He was an educated man, an excellent farmhand and cared for his family. He was buried on the East side of the Heathervale graveyard. He is survived by his wife, Sera.',
+	'Joseph Orazio': {
+		SHORTDESC: 'Joseph Orazio, son of Barbera Orazio, died May 18, 1892. He was 24. He was an educated man, an excellent farmhand and cared for his family. He was buried on the East side of the Heathervale graveyard. He is survived by his wife, Sera.',
 		DUGUP: False,
 		REANIMATED: False,
-		REANIMATOR: 'Silver Watch',
-		DIALOG:  ['Hello there. I\'m Katya. Pleased to meet you. Don\'t be alarmed.','Perhaps alarmed is not the right word. You\'ve defiled my grave, but, then, I\'ve long since lost my pride in worldly things. Tell me, why is it you have summoned me?','I wish to know of your life.','Ah, it is not my life, but my death which is most interesting. My brothers spoke of heatstroke, oh how their lies taint their lips! Murdered by one\'s own kin... And none other than your Uncle Timothy himself struck the killing blow!'],
-		DNUM: 0}
+		REANIMATOR: 'Silver Watch'}
 }
 
 def getObituaryLongDesc():
@@ -179,7 +182,7 @@ itemList = {
 		TAKEABLE: False },
 	'Joseph Orazio\'s Gravestone': {
 		SHORTDESC: 'A small headstone. A solitary daisy lies on the ground at its base.',
-		DESC: 'JosephOrazio\n1868 - 1892',
+		DESC: 'Joseph Orazio\n1868 - 1892',
 		TAKEABLE: False },
 	'Silver Watch': {
 		SHORTDESC: 'Joseph Orazio\'s most prized possession, a silver pocketwatch given to him by his father.',
@@ -191,6 +194,8 @@ def pretty_print(text):
 	for txt in tarray:
 		for line in textwrap.wrap(txt, SCREEN_WIDTH):
 			print(line)
+def d_print(text):
+	pretty_print('\"' + text + '\"')
 			
 def pretty_center_print(text):
 	tarray = text.split('\n')
@@ -268,26 +273,50 @@ def talk(arg):
 	if arg == 'Self':
 		pretty_print('Don\'t do that. People will think you\'re weird.')
 		return
-	for person in worldPlaces[currLocation][PEOPLE]:
+	for person in (worldPlaces[currLocation][PEOPLE] + worldPlaces[currLocation][DECEASED]):
 		if arg in person:
-			if peopleList[person][DNUM] >= len(peopleList[person][DIALOG]):
-				deceasedPeopleList[dp][DNUM] = 0
-				talk(arg)
-			else:
-				pretty_print('\"' + peopleList[person][DIALOG][peopleList[person][DNUM]] + '\"')
-				peopleList[person][DNUM] += 1
-			return
-	for dp in worldPlaces[currLocation][DECEASED]:
-		if arg in dp:
-			if deceasedPeopleList[dp][DNUM] >= len(deceasedPeopleList[dp][DIALOG]):
-				deceasedPeopleList[dp][DNUM] = 0
-				talk(arg)
-			else:
-				pretty_print('\"' + deceasedPeopleList[dp][DIALOG][deceasedPeopleList[dp][DNUM]] + '\"')
-				deceasedPeopleList[dp][DNUM] += 1
-			return
+			talk_switch(person)
+		return
 	pretty_print('Nobody named ' + arg + ' could be found at this location.')
 
+def is_int(x):
+	try:
+		int(x)
+	except ValueError:
+		return False
+	return True
+	
+def choose_response():
+	choice = 'x'	
+	while not is_int(choice) or int(choice) < 1 or int(choice) > 3:
+		choice = raw_input('>')
+	return int(choice)
+	
+def talk_switch(person):
+	if person == 'Joseph Orazio':
+		d_print('Hello, my name is Katya. Who are you?')
+		tw()
+		d_print('Why, it says it right there on the stone. Surely you are smarter than you look?')
+		tw()
+		d_print('(1) I was just making small talk.')
+		d_print('(2) I know who you are.')
+		d_print('(3) And probably smarter than you.')
+		r = choose_response()
+		if r == 1:
+			d_print('And I, just having a little fun.')
+		if r == 2:
+			d_print('Then why waste the breath?')
+		if r == 3:
+			d_print('So young, and full of pride. You would do well to check your aggression.')
+		d_print('But I will give some advice. Say what you mean, and mean what you say. Other spirits, you\'ll find, are much less agreeable than I.')
+		tw()
+		d_print('Do you know anything about my father?')
+		tw()
+		d_print('Much better! Short and to the point.')
+
+def tw():
+	raw_input('...')
+	
 def show_inventory():
 	inventory.sort()
 	if len(inventory) == 0:
@@ -308,6 +337,8 @@ def dig():
 		for dp in worldPlaces[currLocation][DECEASED]:
 			deceasedPeopleList[dp][DUGUP] = True
 			pretty_print(dp + ' dug up.')
+		return
+	pretty_print('Nothing to dig, here.')
 			
 def reanimate(arg):
 	inInventory = False
@@ -331,7 +362,7 @@ def reanimate(arg):
 	for dp in worldPlaces[currLocation][DECEASED]:
 		if deceasedPeopleList[dp][DUGUP] == True and arg1 in dp:
 			if arg2 in deceasedPeopleList[dp][REANIMATOR]:
-				pretty_print('Reanimation succesful.') #FIGURE OUT WHY REANIMATION IS FAILING
+				pretty_print('Reanimation succesful.')
 				deceasedPeopleList[dp][REANIMATED] = True
 				if inInventory:
 					inventory.remove(dropItem)
@@ -349,9 +380,9 @@ def examine(arg):
 	for item in (inventory + worldPlaces[currLocation][GROUND]):
 		if arg in item:
 			if DESC in itemList[item]:
-				pretty_print(item + ': ' + itemList[item][DESC] + '\n')
+				pretty_print(item + ': ' + '\n' + itemList[item][DESC] + '\n')
 			else:
-				pretty_print(item + ': ' + itemList[item][SHORTDESC] + '\n')
+				pretty_print(item + ': ' + '\n' + itemList[item][SHORTDESC] + '\n')
 			if READ in itemList[item]:
 				yn = ''
 				while yn != 'Y' and yn != 'N':
@@ -363,18 +394,18 @@ def examine(arg):
 	for person in (worldPlaces[currLocation][PEOPLE] + ['Self']):
 		if arg in person:
 			if DESC in peopleList[person]:
-				pretty_print(person + ': ' + peopleList[person][DESC] + '\n')
+				pretty_print(person + ': ' + '\n' + peopleList[person][DESC] + '\n')
 				return
 			else:
-				pretty_print(person + ': ' + peopleList[person][SHORTDESC] + '\n')
+				pretty_print(person + ': ' + '\n' + peopleList[person][SHORTDESC] + '\n')
 				return
 	for dp in (worldPlaces[currLocation][DECEASED]):
 		if arg in dp:
 			if DESC in deceasedPeopleList[dp]:
-				pretty_print(dp + ': ' + deceasedPeopleList[person][DESC] + '\n')
+				pretty_print(dp + ': ' + '\n' + deceasedPeopleList[person][DESC] + '\n')
 				return
 			else:
-				pretty_print(dp + ': ' + deceasedPeopleList[person][SHORTDESC] + '\n')
+				pretty_print(dp + ': ' + '\n' + deceasedPeopleList[person][SHORTDESC] + '\n')
 				return
 	pretty_print('There isn\'t anything like that to look at.')
 
@@ -542,6 +573,9 @@ class adventureConsole(cmd.Cmd):
 	def do_loc(self, arg):
 		print
 		display_place_info(currLocation)
+	def help_loc(self):
+		print
+		pretty_print('Shorthand for \'location\'')
 	def help_location(self):
 		print
 		pretty_print('Shows information on the current location.')
